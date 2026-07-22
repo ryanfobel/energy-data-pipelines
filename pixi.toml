@@ -41,6 +41,11 @@ test-home-assistant = "python scripts/test_ha_dbt_only.py"
 test-export = "python scripts/test_ha_export.py"
 test-all = "python scripts/test_combined_pipeline.py"
 
+# Dashboard
+dashboard-install = { cmd = "npm install", cwd = "dashboard" }
+dashboard-dev = { cmd = "npm run dev", cwd = "dashboard" }
+dashboard-build = { cmd = "npm run build", cwd = "dashboard" }
+
 # Utilities
 clean = "python -c 'import shutil; [shutil.rmtree(p, ignore_errors=True) for p in [\"data\", \"logs\", \"transform/target\"]]; import pathlib; [p.unlink() for p in pathlib.Path(\".\").glob(\"*.duckdb\")]'"
 generate-mock-data = "python scripts/generate_mock_ha_data.py"

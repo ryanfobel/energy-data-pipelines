@@ -1,0 +1,11 @@
+plugins:
+  components:
+    "@evidence-dev/core-components": {}
+  datasources:
+    "@evidence-dev/duckdb": {}
+
+sources:
+  energy:
+    connector: duckdb
+    options:
+      filename: ../energy_warehouse.duckdb

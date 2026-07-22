@@ -7,13 +7,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+- Evidence.dev dashboard with multi-commodity visualizations
+- Dashboard pages for electricity, gas, and water
+- Multi-commodity support: natural gas and water from Green Button
+- Staging models for gas (`stg_green_button_gas`) and water (`stg_green_button_water`)
+- Mart models: `fct_gas_consumption`, `fct_water_consumption`, `fct_utility_consumption`
+- Dashboard README with deployment options
+
+### Changed
+- Updated README to focus on energy pipelines (removed open-data-coop content)
+- Evidence.dev marked as implemented (moved from Planned)
+
 ### Planned
-- Evidence.dev dashboard integration
 - Direct InfluxDB export (without parquet intermediate)
 - Additional data sources (Sense, Curb, Neurio)
 - Docker Compose deployment option
 - Automated testing with GitHub Actions
 - Rate optimization module
+- Water test data and validation
 
 ## [1.0.0] - 2026-07-21
 
