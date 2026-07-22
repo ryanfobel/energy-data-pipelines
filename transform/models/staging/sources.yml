@@ -5,7 +5,7 @@ sources:
     description: Raw data loaded by dlt pipelines
     tables:
       - name: green_button_interval_readings
-        description: Raw Green Button ESPI interval readings
+        description: Raw Green Button ESPI interval readings (electricity, gas, water)
         columns:
           - name: home_id
             description: Unique home identifier
@@ -16,9 +16,13 @@ sources:
             tests:
               - not_null
           - name: kwh
-            description: Energy consumption (kWh)
+            description: Consumption value (kWh for electricity, m³ for gas/water)
             tests:
               - not_null
+          - name: commodity
+            description: Commodity type enum (VALUE_1=electricity, VALUE_7=gas, VALUE_2=water)
+          - name: uom
+            description: Unit of measure enum (VALUE_72=Wh, VALUE_42=m³, VALUE_119=gallons)
 
       - name: power_monitoring
         description: Home Assistant real-time power monitoring data (from Emporia Vue, IoTaWatt, Shelly, etc)
