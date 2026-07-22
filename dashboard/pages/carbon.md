@@ -12,10 +12,11 @@ SELECT
   SUM(kg_co2e) as total_kg_co2e,
   SUM(kg_co2e) / 1000 as total_tonnes_co2e,
   AVG(co2e_intensity_gco2_per_kwh) as avg_grid_intensity,
-  AVG(grid_clean_pct) as avg_grid_clean_pct,
+  AVG(NULLIF(grid_clean_pct, 0)) as avg_grid_clean_pct,
   COUNT(*) as total_readings,
   COUNT(co2e_intensity_gco2_per_kwh) as readings_with_carbon
 FROM energy.fct_electricity_carbon
+WHERE co2e_intensity_gco2_per_kwh IS NOT NULL
 ```
 
 ```sql daily_emissions
@@ -24,7 +25,7 @@ SELECT
   SUM(kwh) as kwh,
   SUM(kg_co2e) as kg_co2e,
   AVG(co2e_intensity_gco2_per_kwh) as avg_intensity,
-  AVG(grid_clean_pct) as avg_clean_pct
+  AVG(NULLIF(grid_clean_pct, 0)) as avg_clean_pct
 FROM energy.fct_electricity_carbon
 WHERE co2e_intensity_gco2_per_kwh IS NOT NULL
 GROUP BY DATE_TRUNC('day', timestamp)
@@ -111,10 +112,17 @@ ORDER BY hour
   data={daily_emissions}
   x=day
   y=avg_intensity
-  y2=avg_clean_pct
   yAxisTitle="gCO2/kWh"
-  y2AxisTitle="% Clean"
-  title="Grid Intensity & Clean Generation"
+  title="Grid Carbon Intensity"
+/>
+
+<LineChart
+  data={daily_emissions}
+  x=day
+  y=avg_clean_pct
+  yAxisTitle="% Clean Generation"
+  yMax=100
+  title="Grid Clean Generation Percentage"
 />
 
 ## Hourly Pattern
