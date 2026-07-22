@@ -123,3 +123,4 @@ ORDER BY timestamp DESC
 - [Electricity](/electricity) — Hourly consumption from Green Button and real-time monitoring
 - [Natural Gas](/gas) — Monthly gas consumption
 - [Water](/water) — Daily/monthly water usage
+- [Carbon Footprint](/carbon) — Emissions tracking with Ontario grid intensity
