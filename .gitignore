@@ -1,0 +1,40 @@
+# User configuration
+config.local.yml
+.env
+
+# Data files
+*.duckdb
+*.duckdb.wal
+data/
+logs/
+mock_data/
+
+# dbt
+transform/target/
+transform/dbt_packages/
+transform/logs/
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.Python
+*.so
+.venv/
+venv/
+ENV/
+.pixi/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Backups
+*.bak
+*.backup

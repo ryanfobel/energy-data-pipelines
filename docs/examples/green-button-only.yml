@@ -1,0 +1,103 @@
+# Configuration: Green Button Only
+#
+# Use this configuration if you only have Green Button data from your utility.
+# This is the simplest setup - just download your XML files and run the pipeline.
+
+# Data warehouse settings
+warehouse:
+  # DuckDB database file location
+  database_path: "energy_warehouse.duckdb"
+
+  # Where to export Parquet files for long-term storage
+  export_path: "~/energy-data/warehouse"
+
+# Homes to process
+homes:
+  # Home 1: Your primary residence
+  - id: "home-001"
+    name: "Primary Residence"
+
+    # Data sources for this home
+    sources:
+      # Green Button electricity data
+      green_button:
+        enabled: true
+
+        # Path to Green Button XML file(s)
+        # You can specify one file or multiple files (for different years)
+        files:
+          - "data/greenbutton/hydro_one_2024.xml"
+          # Uncomment to add more years:
+          # - "data/greenbutton/hydro_one_2023.xml"
+          # - "data/greenbutton/hydro_one_2022.xml"
+
+        # Optional: Specify commodity type if XML doesn't include it
+        # commodity: "electricity"  # or "natural_gas"
+
+      # Home Assistant power monitoring (disabled)
+      home_assistant:
+        enabled: false
+
+# Optional: Add a second home (vacation property, rental, etc.)
+# Uncomment and customize:
+#
+# - id: "cottage-001"
+#   name: "Cottage"
+#   sources:
+#     green_button:
+#       enabled: true
+#       files:
+#         - "data/greenbutton/cottage_utility_2024.xml"
+#     home_assistant:
+#       enabled: false
+
+# Grid data sources (optional)
+# Add public grid data for carbon intensity and rate analysis
+grid:
+  enabled: false  # Set to true to include grid data
+
+  # Which grid data sources to pull
+  sources:
+    - ieso        # Ontario IESO generation mix
+    - gridwatch   # Real-time carbon intensity
+    - oeb         # Ontario Energy Board rate tables
+
+  # Where to store grid data
+  database_path: "grid_data.duckdb"
+
+# Pipeline settings
+pipeline:
+  # dlt settings
+  dlt:
+    # Number of parallel workers for data loading
+    workers: 4
+
+    # Buffer size for batch inserts
+    buffer_size: 1000
+
+  # dbt settings
+  dbt:
+    # Number of threads for parallel model execution
+    threads: 4
+
+    # Target environment (dev or prod)
+    target: "dev"
+
+# Logging
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR
+  level: "INFO"
+
+  # Log file location
+  file: "logs/pipeline.log"
+
+# Data retention
+retention:
+  # Keep raw DuckDB database files
+  keep_database_backups: true
+
+  # Number of days to keep old backups
+  backup_retention_days: 90
+
+  # Compress old databases
+  compress_backups: true

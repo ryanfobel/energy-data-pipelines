@@ -1,0 +1,45 @@
+version: 2
+
+sources:
+  - name: raw
+    description: Raw data loaded by dlt pipelines
+    tables:
+      - name: green_button_interval_readings
+        description: Raw Green Button ESPI interval readings
+        columns:
+          - name: home_id
+            description: Unique home identifier
+            tests:
+              - not_null
+          - name: timestamp
+            description: Interval start time (UTC)
+            tests:
+              - not_null
+          - name: kwh
+            description: Energy consumption (kWh)
+            tests:
+              - not_null
+
+      - name: power_monitoring
+        description: Home Assistant real-time power monitoring data (from Emporia Vue, IoTaWatt, Shelly, etc)
+        columns:
+          - name: home_id
+            description: Unique home identifier
+            tests:
+              - not_null
+          - name: device_id
+            description: Device identifier (e.g., emporia_vue_main)
+            tests:
+              - not_null
+          - name: channel
+            description: Channel number (0 for whole-home, 1+ for circuits)
+            tests:
+              - not_null
+          - name: timestamp
+            description: Measurement timestamp (UTC)
+            tests:
+              - not_null
+          - name: watts
+            description: Instantaneous power (W)
+            tests:
+              - not_null

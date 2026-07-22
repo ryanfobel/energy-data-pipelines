@@ -1,0 +1,8 @@
+open_data_coop:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: ../energy_warehouse.duckdb
+      schema: main
+      threads: 4

@@ -1,0 +1,195 @@
+# Configuration: Home Assistant Only
+#
+# Use this configuration if you have real-time power monitoring via Home Assistant
+# but don't have Green Button data from your utility.
+#
+# Requirements:
+# - Home Assistant installed with power monitoring device (Emporia Vue, IoTaWatt, Shelly EM)
+# - Power sensor data exported to Parquet format
+
+# Data warehouse settings
+warehouse:
+  database_path: "energy_warehouse.duckdb"
+  export_path: "~/energy-data/warehouse"
+
+# Homes to process
+homes:
+  - id: "home-001"
+    name: "Primary Residence"
+
+    sources:
+      # Green Button (disabled - no utility data available)
+      green_button:
+        enabled: false
+
+      # Home Assistant power monitoring
+      home_assistant:
+        enabled: true
+
+        # Path to exported Home Assistant power monitoring data
+        # This should be a Parquet file with columns:
+        #   - home_id, device_id, channel, channel_name, timestamp, watts, volts, amps, power_factor
+        parquet_file: "data/home_assistant/power_monitoring.parquet"
+
+        # Optional: Generate mock data for testing
+        # Set to true to use generated test data
+        use_mock_data: false
+
+        # Mock data settings (if use_mock_data = true)
+        mock:
+          # Number of days to generate
+          days: 7
+
+          # Interval between readings (seconds)
+          interval_seconds: 10
+
+          # Number of monitoring devices
+          device_count: 2
+
+        # Data quality settings
+        quality:
+          # Minimum measurements per hour for "high quality" flag
+          high_quality_threshold: 360  # 6 per minute
+
+          # Minimum measurements per hour for "medium quality" flag
+          medium_quality_threshold: 60  # 1 per minute
+
+          # Mark as estimated if below this threshold
+          estimated_threshold: 60
+
+        # Device mapping (optional)
+        # Map channels to appliances for better reporting
+        devices:
+          emporia_vue_main:
+            name: "Emporia Vue 3"
+            channels:
+              0: "Whole Home"
+              1: "HVAC"
+              2: "Water Heater"
+              3: "Kitchen"
+              4: "Living Room"
+              5: "Bedrooms"
+              6: "Basement"
+
+          iotawatt_001:
+            name: "IoTaWatt"
+            channels:
+              0: "Main 1"
+              1: "Main 2"
+              2: "Dryer"
+              3: "Stove"
+
+# Optional: Temperature sensors for heat pump analysis
+# If you have Home Assistant temperature sensors, export them similarly
+temperature:
+  enabled: false  # Set to true to include temperature data
+
+  parquet_file: "data/home_assistant/temperature_sensors.parquet"
+
+  # Temperature sensor mapping
+  sensors:
+    outdoor:
+      entity_id: "sensor.outdoor_temperature"
+      name: "Outdoor Temperature"
+
+    indoor:
+      entity_id: "sensor.indoor_temperature"
+      name: "Indoor Temperature"
+
+    hvac_supply:
+      entity_id: "sensor.hvac_supply_temp"
+      name: "HVAC Supply Temperature"
+
+    hvac_return:
+      entity_id: "sensor.hvac_return_temp"
+      name: "HVAC Return Temperature"
+
+# Grid data (optional but recommended)
+# Add carbon intensity to understand emissions
+grid:
+  enabled: true
+
+  sources:
+    - gridwatch   # Real-time Ontario carbon intensity
+
+  database_path: "grid_data.duckdb"
+
+# Time-of-use rate classification
+# Define TOU periods for cost estimation
+rates:
+  enabled: true
+
+  # Ontario TOU schedule (adjust for your region)
+  tou_schedule:
+    weekday:
+      on_peak:    # Period 1 - highest rate
+        hours: [[7, 11], [17, 19]]  # 7-11 AM and 5-7 PM
+        rate_cents_per_kwh: 18.7
+
+      mid_peak:   # Period 2 - medium rate
+        hours: [[11, 17]]  # 11 AM - 5 PM
+        rate_cents_per_kwh: 13.2
+
+      off_peak:   # Period 3 - lowest rate
+        hours: [[0, 7], [19, 24]]  # Before 7 AM and after 7 PM
+        rate_cents_per_kwh: 9.2
+
+    weekend:
+      # Weekends are all off-peak
+      off_peak:
+        hours: [[0, 24]]
+        rate_cents_per_kwh: 9.2
+
+  # Delivery charges (fixed per kWh)
+  delivery_cents_per_kwh: 5.8
+
+  # Regulatory charges
+  regulatory_cents_per_kwh: 1.2
+
+# Pipeline settings
+pipeline:
+  dlt:
+    workers: 4
+    buffer_size: 1000
+
+  dbt:
+    threads: 4
+    target: "dev"
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/pipeline.log"
+
+# Data retention
+retention:
+  # Raw power monitoring data can be large
+  # Archive old data to Parquet after processing
+  archive_raw_data: true
+
+  # Keep raw data for this many days before archiving
+  raw_data_retention_days: 30
+
+  # Compress archived data
+  compress_archives: true
+
+# Export settings
+export:
+  # Export frequency (for scheduled runs)
+  frequency: "daily"
+
+  # Partitioning strategy for Parquet exports
+  partition_by:
+    - "home_id"
+    - "device_id"
+
+  # Aggregation options
+  aggregations:
+    # Export hourly rollups (in addition to raw data)
+    hourly: true
+
+    # Export daily summaries
+    daily: true
+
+    # Export monthly summaries
+    monthly: true

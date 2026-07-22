@@ -1,0 +1,458 @@
+# Configuration: Full Setup
+#
+# Complete configuration with all features enabled:
+# - Green Button utility data (hourly)
+# - Home Assistant power monitoring (10-second intervals)
+# - Temperature sensors for heat pump analysis
+# - Grid carbon intensity
+# - Time-of-use rate modeling
+# - Multiple homes
+#
+# This is the most comprehensive setup for advanced analysis.
+
+# Data warehouse settings
+warehouse:
+  database_path: "energy_warehouse.duckdb"
+  export_path: "~/energy-data/warehouse"
+
+  # Backup settings
+  backup:
+    enabled: true
+    path: "~/energy-data/backups"
+    frequency: "weekly"
+    retention_weeks: 12
+
+# Homes to process
+homes:
+  # Primary residence with full monitoring
+  - id: "home-001"
+    name: "Primary Residence"
+    address: "123 Main St, Kitchener ON"  # Optional, for reports
+    vintage: 1985  # Optional, house built year
+    heated_area_sqft: 2400  # Optional, for heat pump analysis
+
+    sources:
+      # Green Button electricity data from utility
+      green_button:
+        enabled: true
+        files:
+          - "data/greenbutton/home001_2024.xml"
+          - "data/greenbutton/home001_2023.xml"
+          - "data/greenbutton/home001_2022.xml"
+
+        # Utility information
+        utility:
+          name: "Hydro One"
+          account_number: "redacted"  # For reference only
+
+      # Real-time power monitoring from Home Assistant
+      home_assistant:
+        enabled: true
+        parquet_file: "data/home_assistant/home001_power.parquet"
+
+        quality:
+          high_quality_threshold: 360  # 6 per minute
+          medium_quality_threshold: 60  # 1 per minute
+          estimated_threshold: 60
+
+        devices:
+          emporia_vue_main:
+            name: "Emporia Vue 3"
+            installation_date: "2023-09-15"
+            channels:
+              0: "Whole Home"
+              1: "Heat Pump"
+              2: "Water Heater"
+              3: "EV Charger"
+              4: "Kitchen"
+              5: "Living Room"
+              6: "Bedrooms"
+              7: "Basement"
+              8: "Garage"
+
+      # Temperature sensors
+      temperature:
+        enabled: true
+        parquet_file: "data/home_assistant/home001_temperature.parquet"
+
+        sensors:
+          outdoor:
+            entity_id: "sensor.outdoor_temperature"
+            name: "Outdoor Temperature"
+            location: "North wall, shaded"
+
+          indoor_main:
+            entity_id: "sensor.indoor_temperature"
+            name: "Main Floor Temperature"
+            location: "Living room"
+
+          indoor_upstairs:
+            entity_id: "sensor.upstairs_temperature"
+            name: "Upstairs Temperature"
+            location: "Hallway"
+
+          indoor_basement:
+            entity_id: "sensor.basement_temperature"
+            name: "Basement Temperature"
+            location: "Utility room"
+
+          heat_pump_supply:
+            entity_id: "sensor.heat_pump_supply_temp"
+            name: "Heat Pump Supply"
+            location: "HVAC supply line"
+
+          heat_pump_return:
+            entity_id: "sensor.heat_pump_return_temp"
+            name: "Heat Pump Return"
+            location: "HVAC return line"
+
+    # Home characteristics (for analysis)
+    characteristics:
+      # Building envelope
+      insulation:
+        attic_r_value: 60
+        walls_r_value: 20
+        basement_r_value: 22
+        windows: "Triple pane, low-e"
+
+      # HVAC system
+      heating:
+        type: "air_source_heat_pump"
+        brand: "Mitsubishi"
+        model: "Hyper-Heat"
+        capacity_btu: 36000
+        rated_cop: 3.2
+        installation_date: "2023-08-01"
+        backup_heat: "electric_resistance"
+
+      cooling:
+        type: "air_source_heat_pump"
+        same_as_heating: true
+        rated_eer: 14.5
+
+      # Other major loads
+      water_heater:
+        type: "heat_pump"
+        capacity_gallons: 50
+        installation_date: "2023-09-01"
+
+      ev_charger:
+        type: "level_2"
+        max_power_kw: 7.2
+
+  # Second home (vacation property)
+  - id: "cottage-001"
+    name: "Cottage"
+    address: "456 Lake Rd, Haliburton ON"
+    vintage: 1975
+    heated_area_sqft: 1200
+
+    sources:
+      green_button:
+        enabled: true
+        files:
+          - "data/greenbutton/cottage_2024.xml"
+
+        utility:
+          name: "Hydro One"
+
+      home_assistant:
+        enabled: false  # No real-time monitoring at cottage
+
+# Grid data sources
+grid:
+  enabled: true
+
+  sources:
+    - ieso        # Ontario generation mix (5-minute intervals)
+    - gridwatch   # Real-time carbon intensity
+    - oeb         # Rate tables and regulatory info
+
+  database_path: "grid_data.duckdb"
+
+  # Grid analysis settings
+  analysis:
+    # Calculate marginal emissions (what's on the margin)
+    marginal_emissions: true
+
+    # Track renewable percentage
+    renewable_tracking: true
+
+# Time-of-use rates
+rates:
+  enabled: true
+
+  # Ontario TOU schedule
+  tou_schedule:
+    weekday:
+      on_peak:
+        hours: [[7, 11], [17, 19]]
+        rate_cents_per_kwh: 18.7
+
+      mid_peak:
+        hours: [[11, 17]]
+        rate_cents_per_kwh: 13.2
+
+      off_peak:
+        hours: [[0, 7], [19, 24]]
+        rate_cents_per_kwh: 9.2
+
+    weekend:
+      off_peak:
+        hours: [[0, 24]]
+        rate_cents_per_kwh: 9.2
+
+  # Additional charges
+  delivery_cents_per_kwh: 5.8
+  regulatory_cents_per_kwh: 1.2
+  hst_rate: 0.13
+
+  # Tiered pricing (alternative to TOU)
+  tiered:
+    enabled: false  # Set true if you're on tiered pricing instead of TOU
+
+    tier1:
+      threshold_kwh: 600  # First 600 kWh per month
+      rate_cents_per_kwh: 10.5
+
+    tier2:
+      threshold_kwh: 99999  # Anything above 600 kWh
+      rate_cents_per_kwh: 12.8
+
+# Weather data (optional)
+weather:
+  enabled: true
+
+  # Weather source
+  source: "environment_canada"
+
+  # Weather station
+  station:
+    id: "YKF"  # Waterloo airport
+    name: "Waterloo Region"
+
+  # Fetch historical data
+  historical:
+    enabled: true
+    start_date: "2022-01-01"
+
+  # Heating and cooling degree days
+  degree_days:
+    enabled: true
+    base_celsius: 18  # Base temperature for HDD/CDD
+
+# Analysis modules
+analysis:
+  # Heat pump performance analysis
+  heat_pump:
+    enabled: true
+
+    # Calculate effective COP
+    cop_calculation:
+      method: "energy_balance"  # or "temperature_delta"
+
+      # Require both indoor and outdoor temp for COP calc
+      require_temperature_data: true
+
+    # Track performance by outdoor temperature bins
+    temperature_bins:
+      - [-30, -20]
+      - [-20, -10]
+      - [-10, 0]
+      - [0, 10]
+      - [10, 20]
+      - [20, 30]
+
+  # Solar sizing analysis
+  solar:
+    enabled: true
+
+    # Analyze load shape for self-consumption
+    self_consumption_analysis: true
+
+    # Net metering rules
+    net_metering:
+      enabled: true
+      rate_cents_per_kwh: 9.2  # Export rate (usually off-peak)
+
+  # EV charging analysis
+  ev:
+    enabled: true
+
+    # Detect charging sessions
+    session_detection:
+      min_power_kw: 1.0  # Minimum power to consider charging
+      min_duration_minutes: 15
+
+    # Optimal charging windows
+    optimal_windows:
+      prefer_off_peak: true
+      prefer_renewable: true  # Charge when grid is greenest
+
+  # Rate optimization
+  rate_optimization:
+    enabled: true
+
+    # Compare rate plans
+    plans_to_compare:
+      - "tou"      # Time of use
+      - "tiered"   # Tiered pricing
+      - "ulo"      # Ultra-low overnight (if available)
+
+    # Simulate load shifting
+    load_shifting:
+      enabled: true
+      flexible_loads:
+        - "ev_charger"
+        - "water_heater"
+
+# Pipeline settings
+pipeline:
+  dlt:
+    workers: 4
+    buffer_size: 1000
+
+    # Incremental loading
+    incremental:
+      enabled: true
+      checkpoint_file: ".dlt_checkpoint"
+
+  dbt:
+    threads: 4
+    target: "dev"
+
+    # Run tests after models
+    run_tests: true
+
+    # Generate documentation
+    generate_docs: true
+
+# Logging
+logging:
+  level: "INFO"
+  file: "logs/pipeline.log"
+
+  # Separate log files for different components
+  separate_logs:
+    enabled: true
+    dlt_log: "logs/dlt.log"
+    dbt_log: "logs/dbt.log"
+    analysis_log: "logs/analysis.log"
+
+# Data retention
+retention:
+  # Raw DuckDB databases
+  keep_database_backups: true
+  backup_retention_days: 90
+  compress_backups: true
+
+  # Parquet exports
+  parquet_retention_years: 10
+
+  # Raw power monitoring data (high-frequency)
+  raw_power_monitoring_retention_days: 30
+
+# Export settings
+export:
+  frequency: "daily"
+
+  # Parquet partitioning
+  partition_by:
+    electricity_consumption: ["home_id", "year", "month"]
+    power_monitoring: ["home_id", "device_id"]
+    temperature: ["home_id", "year", "month"]
+
+  # Aggregations
+  aggregations:
+    hourly: true
+    daily: true
+    weekly: true
+    monthly: true
+    annual: true
+
+  # Compression
+  compression: "snappy"  # or "gzip", "zstd"
+
+# Notifications (optional)
+notifications:
+  enabled: false  # Set to true to enable
+
+  # Email notifications
+  email:
+    enabled: false
+    smtp_server: "smtp.gmail.com"
+    smtp_port: 587
+    from_address: "alerts@example.com"
+    to_addresses:
+      - "you@example.com"
+
+    # When to send notifications
+    on_success: false
+    on_failure: true
+    on_anomaly: true  # Unusual consumption detected
+
+  # Slack notifications
+  slack:
+    enabled: false
+    webhook_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
+
+# Privacy settings
+privacy:
+  # Anonymize sensitive fields
+  anonymize:
+    enabled: false  # Enable if sharing data with cooperative
+
+    # Hash these fields
+    hash_fields:
+      - "meter_id"
+      - "account_number"
+
+    # Redact these fields
+    redact_fields:
+      - "address"
+
+  # Data sharing (opt-in cooperative backup)
+  sharing:
+    enabled: false  # Enable to sync with cooperative server
+
+    # Cooperative server settings
+    server:
+      url: "https://data.energycoop.example.org"
+      auth_token_file: ".coop_token"
+
+    # Encryption
+    encryption:
+      enabled: true
+      public_key_file: ".coop_public_key"
+
+    # What to share
+    share:
+      aggregated_data: true   # Daily/monthly summaries
+      raw_data: false         # High-res data stays local
+      metadata: true          # Home characteristics (for cohort analysis)
+
+# Advanced settings
+advanced:
+  # Experimental features
+  experimental:
+    # Machine learning models
+    ml_models:
+      enabled: false
+      anomaly_detection: false
+      load_forecasting: false
+
+    # Real-time streaming (future)
+    streaming:
+      enabled: false
+
+  # Performance tuning
+  performance:
+    # DuckDB memory limit (MB)
+    duckdb_memory_limit: 8192
+
+    # Number of threads for DuckDB queries
+    duckdb_threads: 4
+
+    # Cache query results
+    cache_queries: true
+    cache_ttl_minutes: 60

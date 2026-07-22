@@ -1,0 +1,109 @@
+# Open Data Coop Configuration
+# Copy this file to config.local.yml and customize for your environment
+# Secrets should go in .env file (see .env.example)
+
+# Paths - use ~ for home directory, ${VAR} for environment variables
+paths:
+  # DuckDB database file (main warehouse)
+  duckdb: "energy_warehouse.duckdb"
+
+  # Directory for mock/test data
+  mock_data: "mock_data"
+
+  # Paimon warehouse export directory
+  paimon_warehouse: "~/energy-data/warehouse"
+
+  # Directory for logs
+  logs: "logs"
+
+  # Directory for temporary data
+  data: "data"
+
+# Home Assistant configuration
+home_assistant:
+  # Whether to enable Home Assistant pipeline
+  enabled: false
+
+  # Path to parquet file with power monitoring data
+  # Or use ${HA_PARQUET_FILE} to read from environment
+  parquet_file: "${HA_PARQUET_FILE}"
+
+  # Optional: InfluxDB configuration (if reading from InfluxDB instead of parquet)
+  influxdb:
+    url: "${INFLUXDB_URL}"
+    token: "${INFLUXDB_TOKEN}"
+    org: "${INFLUXDB_ORG}"
+    bucket: "${INFLUXDB_BUCKET}"
+
+# Green Button configuration
+green_button:
+  # Whether to enable Green Button pipeline
+  enabled: true
+
+  # Directory containing Green Button XML files
+  # Or use ${GREEN_BUTTON_DIR} to read from environment
+  xml_directory: "${GREEN_BUTTON_DIR}"
+
+  # Default home ID (can be overridden per file)
+  default_home_id: "test-home-001"
+
+  # File pattern to match (glob)
+  file_pattern: "*.xml"
+
+# Paimon export configuration
+paimon:
+  # Tables to export to Paimon warehouse
+  exports:
+    - table: "main_marts.fct_electricity_consumption"
+      output_dir: "electricity_consumption"
+      partition_cols:
+        - "home_id"
+        - "year"
+        - "month"
+
+    - table: "raw.power_monitoring"
+      output_dir: "power_monitoring"
+      partition_cols:
+        - "home_id"
+        - "device_id"
+
+# DLT (data load tool) configuration
+dlt:
+  # Pipeline names
+  pipeline_names:
+    home_assistant: "home_assistant"
+    green_button: "green_button"
+
+  # Destination configuration
+  destination: "duckdb"
+
+  # Dataset names
+  datasets:
+    raw: "raw"
+    staging: "staging"
+    marts: "marts"
+
+# Data quality settings
+quality:
+  # Maximum acceptable power reading (watts)
+  max_watts: 50000
+
+  # Whether to filter out negative values
+  filter_negative: true
+
+  # Whether to log data quality warnings
+  log_warnings: true
+
+# Logging configuration
+logging:
+  # Log level: DEBUG, INFO, WARNING, ERROR, CRITICAL
+  level: "INFO"
+
+  # Log format
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+
+  # Whether to log to file
+  log_to_file: true
+
+  # Log file name
+  log_file: "${logs}/pipeline.log"
