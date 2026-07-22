@@ -47,3 +47,97 @@ sources:
             description: Instantaneous power (W)
             tests:
               - not_null
+
+      - name: weather_hourly
+        description: Hourly weather data from Open-Meteo Historical Weather API (includes cloud cover and solar radiation for PVLIB modeling)
+        columns:
+          - name: location_name
+            description: Location identifier (e.g., 'toronto')
+            tests:
+              - not_null
+          - name: timestamp
+            description: Measurement timestamp (local timezone)
+            tests:
+              - not_null
+          - name: temperature_c
+            description: Temperature in Celsius
+            tests:
+              - not_null
+          - name: humidity_pct
+            description: Relative humidity (0-100)
+          - name: precipitation_mm
+            description: Precipitation in millimeters
+          - name: windspeed_kmh
+            description: Wind speed in kilometers per hour
+          - name: cloud_cover_pct
+            description: Total cloud cover as area fraction (0-100%)
+          - name: cloud_cover_low_pct
+            description: Low level clouds and fog up to 2km altitude (0-100%)
+          - name: cloud_cover_mid_pct
+            description: Mid level clouds from 2 to 6km altitude (0-100%)
+          - name: cloud_cover_high_pct
+            description: High level clouds from 6km altitude (0-100%)
+          - name: ghi_wm2
+            description: Global Horizontal Irradiance - total solar radiation on horizontal surface (W/m²)
+          - name: dni_wm2
+            description: Direct Normal Irradiance - direct solar radiation perpendicular to sun (W/m²)
+          - name: dhi_wm2
+            description: Diffuse Horizontal Irradiance - scattered solar radiation on horizontal surface (W/m²)
+          - name: direct_horizontal_wm2
+            description: Direct solar radiation on horizontal plane (W/m²)
+          - name: sunshine_duration_s
+            description: Number of seconds of sunshine in the preceding hour (0-3600s, calculated when DNI > 120 W/m²)
+          - name: latitude
+            description: Actual latitude used by API
+          - name: longitude
+            description: Actual longitude used by API
+          - name: elevation_m
+            description: Elevation in meters
+
+      - name: air_quality_hourly
+        description: Hourly air quality data from Open-Meteo Air Quality API (includes PM2.5, UV index, and aerosol optical depth for solar panel soiling analysis)
+        columns:
+          - name: location_name
+            description: Location identifier (e.g., 'toronto')
+            tests:
+              - not_null
+          - name: timestamp
+            description: Measurement timestamp (local timezone)
+            tests:
+              - not_null
+          - name: pm2_5
+            description: PM2.5 particulate matter concentration (µg/m³) - primary health metric
+          - name: pm10
+            description: PM10 particulate matter concentration (µg/m³) - health and HVAC filter impact
+          - name: dust
+            description: Dust concentration (µg/m³) - solar panel soiling indicator
+          - name: ozone
+            description: Ozone (O3) concentration (µg/m³)
+          - name: nitrogen_dioxide
+            description: Nitrogen dioxide (NO2) concentration (µg/m³)
+          - name: sulphur_dioxide
+            description: Sulphur dioxide (SO2) concentration (µg/m³)
+          - name: carbon_monoxide
+            description: Carbon monoxide (CO) concentration (mg/m³)
+          - name: uv_index
+            description: UV index (0-11+) - health and cooling correlation
+          - name: uv_index_clear_sky
+            description: UV index under clear sky conditions
+          - name: aerosol_optical_depth
+            description: Aerosol optical depth - affects solar panel performance
+          - name: european_aqi
+            description: European Air Quality Index (0-100+)
+          - name: european_aqi_pm2_5
+            description: European AQI component based on PM2.5
+          - name: european_aqi_pm10
+            description: European AQI component based on PM10
+          - name: european_aqi_nitrogen_dioxide
+            description: European AQI component based on NO2
+          - name: european_aqi_ozone
+            description: European AQI component based on O3
+          - name: european_aqi_sulphur_dioxide
+            description: European AQI component based on SO2
+          - name: latitude
+            description: Actual latitude used by API
+          - name: longitude
+            description: Actual longitude used by API

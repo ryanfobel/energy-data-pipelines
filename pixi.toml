@@ -10,6 +10,7 @@ python = ">=3.11,<3.12"
 pyyaml = "*"
 # Required for pypaimon (JVM-based Paimon write path)
 openjdk = ">=11,<12"
+requests = ">=2.34.2,<3"
 
 [pypi-dependencies]
 dlt = { version = "*", extras = ["duckdb"] }
@@ -29,6 +30,8 @@ setup-env = "cp .env.example .env && echo 'Edit .env with your API tokens'"
 # Pipelines
 pipeline-green-button = "python scripts/test_green_button_pipeline.py"
 pipeline-home-assistant = "python scripts/test_ha_dbt_only.py"
+pipeline-weather = "python scripts/test_weather_pipeline.py"
+pipeline-air-quality = "python scripts/test_air_quality_pipeline.py"
 pipeline-all = "python scripts/test_combined_pipeline.py"
 
 # Transform
@@ -57,3 +60,5 @@ dashboard-build = { cmd = "npm run build", cwd = "dashboard" }
 clean = "python -c 'import shutil; [shutil.rmtree(p, ignore_errors=True) for p in [\"data\", \"logs\", \"transform/target\"]]; import pathlib; [p.unlink() for p in pathlib.Path(\".\").glob(\"*.duckdb\")]'"
 generate-mock-data = "python scripts/generate_mock_ha_data.py"
 inspect-db = "python -c 'import duckdb; conn = duckdb.connect(\"energy_warehouse.duckdb\"); conn.execute(\"SHOW TABLES\").show()'"
+analyze-weather = "python scripts/analyze_weather_correlation.py"
+analyze-air-quality = "python scripts/analyze_air_quality_impact.py"
