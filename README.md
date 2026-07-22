@@ -13,8 +13,38 @@ Fork this repository to run your own private energy data warehouse with multi-co
 - **Multiple data sources**: Green Button + Home Assistant integration
 - **Interactive dashboard**: Evidence.dev dashboard with visualizations
 - **Local-first**: All data stays on your device
-- **Powered by modern data stack**: dlt + dbt + DuckDB
+- **Apache Paimon storage**: File-based warehouse for easy sync with rclone
+- **Powered by modern data stack**: dlt + dbt + DuckDB + Paimon
 - **Template repository**: Fork and configure with your own data
+
+## Architecture
+
+This pipeline uses **Apache Paimon** as the primary storage format:
+
+```
+Green Button XML ──┐
+                   ├─► dlt ─► DuckDB (staging) ─► dbt ─► Paimon tables
+Home Assistant ────┘                                         ↓
+                                                    DuckDB views (pypaimon-rust)
+                                                             ↓
+                                                    Evidence dashboard
+
+Paimon warehouse ──► rclone sync ──► Co-op backup
+```
+
+**Why Paimon?**
+- **File-based**: No catalog server required; works with local filesystem or object storage
+- **Easy sync**: Use rclone to sync warehouse between home server and co-op backup
+- **Versioning**: Snapshots and time travel built-in
+- **Schema evolution**: Add columns without breaking existing queries
+- **No locking**: Multiple readers without database file locking issues
+
+**How it works:**
+1. dlt loads raw data to DuckDB staging tables
+2. dbt transforms to marts and exports to Paimon warehouse (via pypaimon)
+3. DuckDB views read Paimon tables (via pypaimon-rust, no JVM at query time)
+4. Evidence dashboard queries DuckDB views
+5. rclone syncs Paimon warehouse to co-op backup
 
 ## Quick Start
 
@@ -58,7 +88,15 @@ pixi run pipeline-home-assistant
 
 # Run dbt transformations
 pixi run dbt-build
+
+# Export to Paimon warehouse
+pixi run export-paimon
+
+# Create DuckDB views reading Paimon
+pixi run paimon-views
 ```
+
+**Note:** The first time you run this, Java 11+ is required for `pypaimon` (included in pixi dependencies). After export, queries use `pypaimon-rust` which doesn't need JVM.
 
 ### 5. View Dashboard
 
@@ -158,16 +196,35 @@ pixi run dbt-run           # Run all models
 pixi run dbt-build         # Build + test
 pixi run dbt-test          # Test only
 
-# Export to Parquet
-pixi run export-parquet
-
-# Export to Paimon (if configured)
-pixi run export-paimon
+# Paimon workflow
+pixi run export-paimon     # Export dbt marts to Paimon warehouse
+pixi run paimon-views      # Create DuckDB views reading Paimon
+pixi run paimon-refresh    # Both export + views in one command
 
 # Clean up
 pixi run clean             # Remove DuckDB files
 pixi run clean-all         # Remove DuckDB + dlt state
 ```
+
+### Syncing with rclone
+
+The Paimon warehouse is just a directory of files - perfect for syncing with rclone:
+
+```bash
+# Configure rclone remote (one-time setup)
+rclone config
+
+# Sync to co-op backup
+rclone sync ~/energy-data/warehouse remote:backup/energy-warehouse
+
+# Sync from co-op backup to new machine
+rclone sync remote:backup/energy-warehouse ~/energy-data/warehouse
+
+# After syncing, recreate DuckDB views
+pixi run paimon-views
+```
+
+The warehouse directory contains all your energy data as Paimon tables. No database files to worry about - just sync the directory.
 
 ## Dashboard Deployment
 

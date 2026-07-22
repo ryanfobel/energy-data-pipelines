@@ -8,16 +8,25 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- **Apache Paimon storage layer**: File-based warehouse for easy rclone sync
 - Evidence.dev dashboard with multi-commodity visualizations
 - Dashboard pages for electricity, gas, and water
 - Multi-commodity support: natural gas and water from Green Button
 - Staging models for gas (`stg_green_button_gas`) and water (`stg_green_button_water`)
 - Mart models: `fct_gas_consumption`, `fct_water_consumption`, `fct_utility_consumption`
 - Dashboard README with deployment options
+- `pypaimon` and `pypaimon-rust` dependencies for Paimon support
+- Rewritten `export_to_paimon.py` to write real Paimon tables (not just partitioned Parquet)
+- `create_paimon_views.py` script to create DuckDB views reading Paimon
+- New pixi tasks: `paimon-views`, `paimon-refresh`
+- Paimon configuration in `config.example.yml` with primary keys
+- rclone sync documentation for warehouse backup
 
 ### Changed
 - Updated README to focus on energy pipelines (removed open-data-coop content)
 - Evidence.dev marked as implemented (moved from Planned)
+- Architecture now uses Paimon as primary storage (DuckDB views for querying)
+- Export workflow: dbt → Paimon tables → DuckDB views → Evidence
 
 ### Planned
 - Direct InfluxDB export (without parquet intermediate)

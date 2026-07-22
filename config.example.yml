@@ -55,17 +55,33 @@ paimon:
   # Tables to export to Paimon warehouse
   exports:
     - table: "main_marts.fct_electricity_consumption"
-      output_dir: "electricity_consumption"
-      partition_cols:
+      database: "energy"
+      paimon_table: "fct_electricity_consumption"
+      primary_keys:
         - "home_id"
-        - "year"
-        - "month"
+        - "timestamp"
 
-    - table: "raw.power_monitoring"
-      output_dir: "power_monitoring"
-      partition_cols:
+    - table: "main_marts.fct_gas_consumption"
+      database: "energy"
+      paimon_table: "fct_gas_consumption"
+      primary_keys:
         - "home_id"
-        - "device_id"
+        - "timestamp"
+
+    - table: "main_marts.fct_water_consumption"
+      database: "energy"
+      paimon_table: "fct_water_consumption"
+      primary_keys:
+        - "home_id"
+        - "timestamp"
+
+    - table: "main_marts.fct_utility_consumption"
+      database: "energy"
+      paimon_table: "fct_utility_consumption"
+      primary_keys:
+        - "home_id"
+        - "commodity"
+        - "timestamp"
 
 # DLT (data load tool) configuration
 dlt:

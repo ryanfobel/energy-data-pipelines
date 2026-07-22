@@ -11,10 +11,14 @@ pandas = "*"
 duckdb = "*"
 pyarrow = ">=25.0.0,<26"
 pyyaml = "*"
+# Required for pypaimon (JVM-based Paimon write path)
+openjdk = ">=11,<12"
 
 [pypi-dependencies]
 dlt = { version = "*", extras = ["duckdb"] }
 dbt-duckdb = "*"
+pypaimon = ">=1.3.1,<2"
+pypaimon-rust = ">=0.2.0,<1"
 
 [tasks]
 # Setup
@@ -31,8 +35,10 @@ dbt-run = { cmd = "dbt run --profiles-dir . --project-dir .", cwd = "transform" 
 dbt-test = { cmd = "dbt test --profiles-dir . --project-dir .", cwd = "transform" }
 dbt-docs = { cmd = "dbt docs generate --profiles-dir . --project-dir . && dbt docs serve", cwd = "transform" }
 
-# Export
+# Export & Paimon
 export-paimon = "python scripts/export_to_paimon.py"
+paimon-views = "python scripts/create_paimon_views.py"
+paimon-refresh = { cmd = "python scripts/export_to_paimon.py && python scripts/create_paimon_views.py" }
 export-all = "python scripts/test_ha_export.py"
 
 # Test
