@@ -8,27 +8,26 @@ Multi-commodity utility consumption from Green Button data.
 
 ```sql total_by_commodity
 SELECT
-  commodity,
-  unit,
-  SUM(quantity) as total_consumption,
+  'electricity' as commodity,
+  'kWh' as unit,
+  SUM(kwh) as total_consumption,
   SUM(cost) as total_cost_cents,
   COUNT(*) as reading_count,
   MIN(timestamp) as first_reading,
   MAX(timestamp) as last_reading
-FROM energy.fct_utility_consumption
+FROM energy.fct_electricity
 GROUP BY commodity, unit
-ORDER BY commodity
 ```
 
 ```sql recent_readings
 SELECT
-  commodity,
+  'electricity' as commodity,
   timestamp,
-  quantity,
-  unit,
+  kwh as quantity,
+  'kWh' as unit,
   cost,
   estimated
-FROM energy.fct_utility_consumption
+FROM energy.fct_electricity
 ORDER BY timestamp DESC
 LIMIT 100
 ```

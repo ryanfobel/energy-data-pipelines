@@ -13,7 +13,7 @@ SELECT
   SUM(kwh) as total_kwh,
   SUM(cost) as total_cost_cents,
   COUNT(*) as reading_count
-FROM energy.fct_electricity_consumption
+FROM energy.fct_electricity
 GROUP BY 1, 2
 ORDER BY day DESC
 LIMIT 90
@@ -26,7 +26,7 @@ SELECT
   kwh,
   cost,
   estimated
-FROM energy.fct_electricity_consumption
+FROM energy.fct_electricity
 ORDER BY timestamp DESC
 LIMIT 168  -- Last week
 ```
@@ -39,7 +39,7 @@ SELECT
   SUM(kwh) as total_kwh,
   SUM(cost) / 100.0 as total_cost_dollars,
   AVG(kwh) as avg_kwh_per_reading
-FROM energy.fct_electricity_consumption
+FROM energy.fct_electricity
 GROUP BY year, month, source
 ORDER BY year DESC, month DESC
 ```

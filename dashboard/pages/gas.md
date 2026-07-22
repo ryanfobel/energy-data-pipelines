@@ -15,7 +15,7 @@ SELECT
   cost / 100.0 as cost_dollars,
   estimated,
   quality
-FROM energy.fct_gas_consumption
+FROM fct_gas_consumption
 ORDER BY timestamp DESC
 ```
 
@@ -26,7 +26,7 @@ SELECT
   SUM(m3) as total_m3,
   SUM(cost) / 100.0 as total_cost_dollars,
   AVG(m3) as avg_m3_per_month
-FROM energy.fct_gas_consumption
+FROM fct_gas_consumption
 GROUP BY year
 ORDER BY year DESC
 ```
