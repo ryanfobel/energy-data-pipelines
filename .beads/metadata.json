@@ -1,0 +1,7 @@
+{
+  "database": "dolt",
+  "backend": "dolt",
+  "dolt_mode": "embedded",
+  "dolt_database": "energy_data_pipelines",
+  "project_id": "c7cfb70c-5a90-48de-aad0-c59aff8f1742"
+}
