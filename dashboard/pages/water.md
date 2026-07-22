@@ -18,7 +18,7 @@ SELECT
   cost / 100.0 as cost_dollars,
   estimated,
   quality
-FROM fct_water_consumption
+FROM energy.fct_water
 ORDER BY timestamp DESC
 ```
 
@@ -31,7 +31,7 @@ SELECT
   SUM(gallons) as total_gallons,
   SUM(cost) / 100.0 as total_cost_dollars,
   AVG(m3) as avg_m3_per_reading
-FROM fct_water_consumption
+FROM energy.fct_water
 GROUP BY year, month
 ORDER BY year DESC, month DESC
 ```
@@ -43,7 +43,7 @@ SELECT
   SUM(m3) as total_m3,
   SUM(gallons) as total_gallons,
   SUM(cost) / 100.0 as total_cost_dollars
-FROM fct_water_consumption
+FROM energy.fct_water
 GROUP BY year
 ORDER BY year DESC
 ```

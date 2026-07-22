@@ -16,20 +16,58 @@ SELECT
   MIN(timestamp) as first_reading,
   MAX(timestamp) as last_reading
 FROM energy.fct_electricity
-GROUP BY commodity, unit
+GROUP BY 1, 2
+UNION ALL
+SELECT
+  'natural_gas' as commodity,
+  'm³' as unit,
+  SUM(m3) as total_consumption,
+  SUM(cost) * 100 as total_cost_cents,
+  COUNT(*) as reading_count,
+  MIN(timestamp) as first_reading,
+  MAX(timestamp) as last_reading
+FROM energy.fct_gas
+GROUP BY 1, 2
+UNION ALL
+SELECT
+  'water' as commodity,
+  'm³' as unit,
+  SUM(m3) as total_consumption,
+  SUM(cost) as total_cost_cents,
+  COUNT(*) as reading_count,
+  MIN(timestamp) as first_reading,
+  MAX(timestamp) as last_reading
+FROM energy.fct_water
+GROUP BY 1, 2
 ```
 
 ```sql recent_readings
-SELECT
-  'electricity' as commodity,
-  timestamp,
-  kwh as quantity,
-  'kWh' as unit,
-  cost,
-  estimated
-FROM energy.fct_electricity
+SELECT * FROM (
+  SELECT
+    'electricity' as commodity,
+    timestamp,
+    kwh as quantity,
+    'kWh' as unit,
+    cost,
+    estimated
+  FROM energy.fct_electricity
+  ORDER BY timestamp DESC
+  LIMIT 50
+)
+UNION ALL
+SELECT * FROM (
+  SELECT
+    'natural_gas' as commodity,
+    timestamp,
+    m3 as quantity,
+    'm³' as unit,
+    cost,
+    estimated
+  FROM energy.fct_gas
+  ORDER BY timestamp DESC
+  LIMIT 50
+)
 ORDER BY timestamp DESC
-LIMIT 100
 ```
 
 ## Overview
