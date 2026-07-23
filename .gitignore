@@ -8,6 +8,12 @@ config.local.yml
 data/
 logs/
 mock_data/
+test_data/
+
+# Personal Green Button data (keep private!)
+**/Green_Button*.xml
+**/Kitchener_Utilities*.xml
+**/*_Green_Button_*.xml
 
 # dbt
 transform/target/
