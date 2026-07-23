@@ -9,10 +9,23 @@ Transforms:
   - Add data quality flags
   - Normalize device and channel info
   - Cast timestamps to UTC-aware
+
+NOTE: Currently returns empty result set as power_monitoring data is not yet loaded
 */
 
 with source as (
-    select * from {{ source('raw', 'power_monitoring') }}
+    -- Return empty result set with correct schema
+    select
+        null::varchar as home_id,
+        null::varchar as device_id,
+        null::bigint as channel,
+        null::varchar as channel_name,
+        null::timestamp as timestamp,
+        null::double as watts,
+        null::double as volts,
+        null::double as amps,
+        null::double as power_factor
+    where false
 ),
 
 validated as (

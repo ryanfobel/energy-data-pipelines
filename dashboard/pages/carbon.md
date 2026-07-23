@@ -76,7 +76,7 @@ ORDER BY hour
     title="Avg Grid Intensity"
     fmt="#,##0"
     comparison=avg_grid_clean_pct
-    comparisonFmt="#,##0% clean"
+    comparisonFmt="#,##0.0'% clean'"
   />
   <BigValue
     data={carbon_summary}

@@ -12,7 +12,7 @@ Transforms:
 */
 
 with source as (
-    select * from {{ source('raw', 'green_button_interval_readings') }}
+    select * from green_button.raw.green_button_interval_readings
 ),
 
 decoded as (
@@ -27,8 +27,8 @@ decoded as (
         timestamp as ts,
         duration_seconds,
 
-        -- Energy consumption
-        kwh,
+        -- Energy consumption (convert Wh to kWh)
+        kwh / 1000.0 as kwh,
         raw_value,
 
         -- Cost
