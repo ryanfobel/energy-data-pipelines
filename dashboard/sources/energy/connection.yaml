@@ -1,4 +1,4 @@
 name: energy
 type: duckdb
 options:
-  filename: ../green_button.duckdb
+  filename: ../../../green_button.duckdb

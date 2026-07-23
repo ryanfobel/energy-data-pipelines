@@ -1,5 +1,5 @@
 -- Attach weather database and join with electricity data
-ATTACH '../weather.duckdb' AS weather_db (READ_ONLY);
+ATTACH '../../../weather.duckdb' AS weather_db (READ_ONLY);
 
 SELECT
   e.timestamp,
@@ -15,7 +15,7 @@ SELECT
   w.cloud_cover_pct,
   DATE_PART('hour', e.timestamp) as hour_of_day,
   DATE_PART('dow', e.timestamp) as day_of_week
-FROM green_button_interval_readings e
+FROM raw.green_button_interval_readings e
 LEFT JOIN weather_db.raw.weather_hourly w
   ON DATE_TRUNC('hour', e.timestamp) = DATE_TRUNC('hour', w.timestamp)
   AND w.location_name = 'kitchener'

@@ -57,7 +57,7 @@ SELECT
   END as temp_range,
   ROUND(AVG(kwh), 2) as avg_kwh_per_hour,
   COUNT(*) as hours
-FROM electricity_with_temp
+FROM electricity_with_weather
 WHERE temperature_c IS NOT NULL
 GROUP BY 1
 ORDER BY
