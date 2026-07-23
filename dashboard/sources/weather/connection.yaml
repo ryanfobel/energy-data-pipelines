@@ -1,4 +1,0 @@
-name: weather
-type: duckdb
-options:
-  filename: ../../../weather.duckdb

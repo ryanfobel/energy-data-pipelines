@@ -1,9 +1,18 @@
 SELECT
     timestamp,
-    kwh as cubic_meters,
+    m3 as cubic_meters,
     cost,
-    quality_code,
-    home_id
-FROM raw.green_button_interval_readings
-WHERE commodity = 'CommodityKindValue.VALUE_9'  -- Water
+    quality,
+    home_id,
+    source,
+    meter_id_hash,
+    estimated,
+    gallons,
+    liters,
+    rate_cents_per_m3,
+    rate_cents_per_gal,
+    year,
+    month,
+    day
+FROM main_marts.fct_water_consumption
 ORDER BY timestamp

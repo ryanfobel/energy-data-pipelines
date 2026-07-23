@@ -1,15 +1,30 @@
--- Carbon data not yet available - need to run dbt transformations
--- For now, just return electricity data
 SELECT
     timestamp,
     kwh,
     cost,
-    tou_bucket,
-    quality_code,
-    meter_id,
+    tou_period,
+    quality,
     home_id,
-    NULL as kg_co2e,
-    NULL as grid_clean_pct
-FROM raw.green_button_interval_readings
-WHERE commodity = 'CommodityKindValue.VALUE_1'  -- Electricity
+    source,
+    meter_id_hash,
+    estimated,
+    kg_co2e,
+    g_co2e,
+    co2e_intensity_gco2_per_kwh,
+    grid_clean_pct,
+    grid_total_mw,
+    grid_nuclear_mw,
+    grid_gas_mw,
+    grid_hydro_mw,
+    grid_wind_mw,
+    grid_solar_mw,
+    grid_biofuel_mw,
+    grid_has_ieso_data,
+    grid_has_gridwatch_data,
+    year,
+    month,
+    day,
+    hour,
+    day_of_week
+FROM main_marts.fct_electricity_with_carbon
 ORDER BY timestamp

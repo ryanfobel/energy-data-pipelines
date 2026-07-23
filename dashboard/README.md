@@ -33,9 +33,17 @@ npm install
 
 ### Development
 
-Start the dev server:
+Start the dev server using the pixi task (recommended - works from any directory):
 
 ```bash
+# From project root
+pixi run dashboard-dev
+```
+
+Or run directly from the dashboard directory:
+
+```bash
+cd dashboard
 npm run dev
 ```
 
@@ -55,12 +63,13 @@ The build output is in `build/`.
 
 ## Data Sources
 
-The dashboard queries these dbt marts from `energy_warehouse.duckdb`:
+The dashboard queries dbt marts from `energy_warehouse.duckdb` (configured in `sources/energy/connection.yaml`):
 
-- `fct_utility_consumption` — Unified view of all commodities
-- `fct_electricity_consumption` — Hourly electricity (Green Button + Home Assistant)
-- `fct_gas_consumption` — Monthly natural gas
-- `fct_water_consumption` — Daily/monthly water
+- `main_marts.fct_electricity_consumption` — Hourly electricity with time-of-use rates
+- `main_marts.fct_electricity_with_carbon` — Electricity with grid carbon intensity data
+- `main_marts.fct_electricity_with_weather` — Electricity with weather and air quality data
+- `main_marts.fct_gas_consumption` — Natural gas with heating degree days
+- `main_marts.fct_water_consumption` — Water usage in multiple units
 
 ## Deployment Options
 
