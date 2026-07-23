@@ -3,6 +3,12 @@
 Scrape hourly electricity data for 2022-2024 using utility-bill-scraper.
 
 This uses Selenium to automate CSV downloads from the Enova Power portal.
+
+Run with:
+  cd /Users/ryan/dev/utility-bill-scraper
+  export ENOVA_USERNAME='your_username'
+  export ENOVA_PASSWORD='your_password'
+  pixi run python ../energy-data-pipelines/scripts/scrape_hourly_electricity.py
 """
 import sys
 from pathlib import Path
@@ -10,7 +16,9 @@ import os
 from datetime import datetime
 
 # Add utility-bill-scraper to path
-scraper_path = Path("/Users/ryan/dev/utility-bill-scraper/src")
+scraper_path = Path(__file__).parent.parent.parent / "utility-bill-scraper" / "src"
+if not scraper_path.exists():
+    scraper_path = Path("/Users/ryan/dev/utility-bill-scraper/src")
 sys.path.insert(0, str(scraper_path))
 
 try:
@@ -19,7 +27,7 @@ except ImportError as e:
     print(f"Error importing utility-bill-scraper: {e}")
     print("Make sure the utility-bill-scraper dependencies are installed:")
     print("  cd /Users/ryan/dev/utility-bill-scraper")
-    print("  poetry install")
+    print("  pixi install")
     sys.exit(1)
 
 
