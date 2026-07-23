@@ -6,46 +6,42 @@ title: Weather & Energy Correlation
 
 How temperature affects your electricity and heating energy usage.
 
-## Configuration
-
-<TextInput
-  name=furnace_efficiency
-  title="Furnace Efficiency (%)"
-  defaultValue="95"
-/>
-
-{#if inputs.furnace_efficiency.value}
-  <p>Furnace efficiency: <strong>{inputs.furnace_efficiency.value}%</strong> (1 m³ gas = {(10.55 * inputs.furnace_efficiency.value / 100).toFixed(2)} kWh thermal)</p>
-{/if}
+_Note: Gas heating converted to kWh thermal assuming 95% furnace efficiency (1 m³ gas = 10.55 kWh × 0.95 = 10.02 kWh thermal)_
 
 ```sql electricity_with_temp
 SELECT * FROM electricity_with_weather
 ```
 
-```sql combined_daily_energy
+```sql combined_monthly_energy
 SELECT
-  DATE_TRUNC('day', e.timestamp) as date,
+  DATE_TRUNC('month', e.timestamp) as month,
   ROUND(SUM(e.kwh), 2) as electricity_kwh,
-  ROUND(SUM(COALESCE(g.m3 * 10.55 * ${inputs.furnace_efficiency.value || 95} / 100.0 / 24, 0)), 2) as gas_heating_kwh,
-  ROUND(SUM(e.kwh) + SUM(COALESCE(g.m3 * 10.55 * ${inputs.furnace_efficiency.value || 95} / 100.0 / 24, 0)), 2) as total_energy_kwh,
-  ROUND(AVG(e.temperature_c), 1) as avg_temp,
-  MAX(g.avg_outdoor_temp_c) as gas_avg_temp
+  MAX(g.gas_heating_kwh) as gas_heating_kwh,
+  ROUND(SUM(e.kwh) + COALESCE(MAX(g.gas_heating_kwh), 0), 2) as total_energy_kwh,
+  ROUND(AVG(e.temperature_c), 1) as avg_temp
 FROM electricity_with_weather e
-LEFT JOIN fct_gas g ON DATE_TRUNC('day', e.timestamp) = DATE_TRUNC('day', g.timestamp)
+LEFT JOIN (
+  SELECT
+    DATE_TRUNC('month', timestamp) as month,
+    ROUND(SUM(m3 * 10.55 * 0.95), 2) as gas_heating_kwh,
+    AVG(avg_outdoor_temp_c) as avg_temp
+  FROM fct_gas
+  GROUP BY 1
+) g ON DATE_TRUNC('month', e.timestamp) = g.month
 GROUP BY 1
 ORDER BY 1
 ```
 
-## Combined Daily Energy Usage vs Temperature
+## Combined Monthly Energy Usage vs Temperature
 
 <LineChart
-  data={combined_daily_energy}
-  x=date
+  data={combined_monthly_energy}
+  x=month
   y={['electricity_kwh', 'gas_heating_kwh']}
   y2=avg_temp
   yAxisTitle="Energy (kWh)"
   y2AxisTitle="Temperature (°C)"
-  title="Electricity + Gas Heating vs Temperature"
+  title="Monthly Electricity + Gas Heating vs Temperature"
 />
 
 ## Daily Energy Usage vs Temperature (Electricity Only)
@@ -125,7 +121,7 @@ ORDER BY
 SELECT
   DATE_TRUNC('month', g.timestamp) as month,
   SUM(g.m3) as total_m3_gas,
-  ROUND(SUM(g.m3 * 10.55 * ${inputs.furnace_efficiency.value || 95} / 100.0), 2) as gas_heating_kwh,
+  ROUND(SUM(g.m3 * 10.55 * 0.95), 2) as gas_heating_kwh,
   ROUND(AVG(g.avg_outdoor_temp_c), 1) as avg_temp_c,
   SUM(g.heating_degree_days) as total_hdd,
   COUNT(*) as gas_reading_count
