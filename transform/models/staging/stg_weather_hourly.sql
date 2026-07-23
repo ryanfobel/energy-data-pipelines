@@ -14,7 +14,7 @@ API: https://archive-api.open-meteo.com/v1/archive
 */
 
 with source as (
-    select * from {{ source('raw', 'weather_hourly') }}
+    select * from weather.raw.weather_hourly
 ),
 
 transformed as (

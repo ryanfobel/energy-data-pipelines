@@ -1,5 +1,7 @@
-SELECT
-    ts as timestamp,
+-- Get hourly weather data from electricity_with_weather mart
+-- This avoids needing to attach the weather database in Evidence
+SELECT DISTINCT
+    timestamp,
     location_name,
     temperature_c,
     humidity_pct,
@@ -17,7 +19,8 @@ SELECT
     year,
     month,
     day,
-    hour_of_day,
+    hour,
     day_of_week
-FROM main_staging.stg_weather_hourly
-ORDER BY ts
+FROM main_marts.fct_electricity_with_weather
+WHERE temperature_c IS NOT NULL
+ORDER BY timestamp

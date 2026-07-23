@@ -29,7 +29,30 @@ European AQI Categories:
 */
 
 with source as (
-    select * from {{ source('raw', 'air_quality_hourly') }}
+    -- Return empty result set with correct schema until air quality data is loaded
+    select
+        null::varchar as location_name,
+        null::double as latitude,
+        null::double as longitude,
+        null::varchar as timezone,
+        null::timestamp as timestamp,
+        null::double as pm2_5,
+        null::double as pm10,
+        null::double as dust,
+        null::double as ozone,
+        null::double as nitrogen_dioxide,
+        null::double as sulphur_dioxide,
+        null::double as carbon_monoxide,
+        null::double as uv_index,
+        null::double as uv_index_clear_sky,
+        null::double as aerosol_optical_depth,
+        null::double as european_aqi,
+        null::double as european_aqi_pm2_5,
+        null::double as european_aqi_pm10,
+        null::double as european_aqi_nitrogen_dioxide,
+        null::double as european_aqi_ozone,
+        null::double as european_aqi_sulphur_dioxide
+    where false
 ),
 
 transformed as (
