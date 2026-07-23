@@ -1,4 +1,4 @@
--- Get hourly weather data from electricity_with_weather mart
+-- Get hourly weather and air quality data from electricity_with_weather mart
 -- This avoids needing to attach the weather database in Evidence
 SELECT DISTINCT
     timestamp,
@@ -16,6 +16,16 @@ SELECT DISTINCT
     dhi_wm2,
     sunshine_duration_s,
     temperature_category,
+    -- Air quality metrics
+    pm2_5,
+    pm10,
+    dust,
+    uv_index,
+    aerosol_optical_depth,
+    european_aqi,
+    pm2_5_category,
+    aqi_category,
+    uv_category,
     year,
     month,
     day,
