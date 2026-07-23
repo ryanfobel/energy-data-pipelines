@@ -15,7 +15,7 @@ SELECT
   COUNT(*) as reading_count,
   MIN(timestamp) as first_reading,
   MAX(timestamp) as last_reading
-FROM energy.fct_electricity
+FROM fct_electricity
 GROUP BY 1, 2
 UNION ALL
 SELECT
@@ -26,7 +26,7 @@ SELECT
   COUNT(*) as reading_count,
   MIN(timestamp) as first_reading,
   MAX(timestamp) as last_reading
-FROM energy.fct_gas
+FROM fct_gas
 GROUP BY 1, 2
 UNION ALL
 SELECT
@@ -37,7 +37,7 @@ SELECT
   COUNT(*) as reading_count,
   MIN(timestamp) as first_reading,
   MAX(timestamp) as last_reading
-FROM energy.fct_water
+FROM fct_water
 GROUP BY 1, 2
 ```
 
@@ -50,7 +50,7 @@ SELECT * FROM (
     'kWh' as unit,
     cost,
     estimated
-  FROM energy.fct_electricity
+  FROM fct_electricity
   ORDER BY timestamp DESC
   LIMIT 50
 )
@@ -63,7 +63,7 @@ SELECT * FROM (
     'm³' as unit,
     cost,
     estimated
-  FROM energy.fct_gas
+  FROM fct_gas
   ORDER BY timestamp DESC
   LIMIT 50
 )

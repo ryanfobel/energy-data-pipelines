@@ -14,7 +14,7 @@ SELECT
   SUM(m3) as total_m3,
   SUM(cost) as total_cost_dollars,
   COUNT(*) as reading_count
-FROM energy.fct_gas
+FROM fct_gas
 GROUP BY timestamp, year, month
 ORDER BY timestamp DESC
 ```
@@ -26,7 +26,7 @@ SELECT
   cost as cost_dollars,
   estimated,
   quality
-FROM energy.fct_gas
+FROM fct_gas
 ORDER BY timestamp DESC
 LIMIT 50
 ```

@@ -1,6 +1,8 @@
 SELECT
     timestamp,
-    m3 as cubic_meters,
+    m3,
+    raw_volume,
+    raw_unit,
     cost,
     quality,
     home_id,

@@ -15,7 +15,7 @@ SELECT
   AVG(NULLIF(grid_clean_pct, 0)) as avg_grid_clean_pct,
   COUNT(*) as total_readings,
   COUNT(co2e_intensity_gco2_per_kwh) as readings_with_carbon
-FROM energy.fct_electricity_carbon
+FROM fct_electricity_carbon
 WHERE co2e_intensity_gco2_per_kwh IS NOT NULL
 ```
 
@@ -26,7 +26,7 @@ SELECT
   SUM(kg_co2e) as kg_co2e,
   AVG(co2e_intensity_gco2_per_kwh) as avg_intensity,
   AVG(NULLIF(grid_clean_pct, 0)) as avg_clean_pct
-FROM energy.fct_electricity_carbon
+FROM fct_electricity_carbon
 WHERE co2e_intensity_gco2_per_kwh IS NOT NULL
 GROUP BY DATE_TRUNC('day', timestamp)
 ORDER BY day DESC
@@ -41,7 +41,7 @@ SELECT
   SUM(kg_co2e) as kg_co2e,
   SUM(kg_co2e) / 1000 as tonnes_co2e,
   AVG(co2e_intensity_gco2_per_kwh) as avg_intensity
-FROM energy.fct_electricity_carbon
+FROM fct_electricity_carbon
 WHERE co2e_intensity_gco2_per_kwh IS NOT NULL
 GROUP BY year, month
 ORDER BY year DESC, month DESC
@@ -53,7 +53,7 @@ SELECT
   AVG(co2e_intensity_gco2_per_kwh) as avg_intensity,
   AVG(grid_clean_pct) as avg_clean_pct,
   SUM(kg_co2e) as total_kg_co2e
-FROM energy.fct_electricity_carbon
+FROM fct_electricity_carbon
 WHERE co2e_intensity_gco2_per_kwh IS NOT NULL
 GROUP BY hour
 ORDER BY hour
